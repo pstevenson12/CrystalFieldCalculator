@@ -21,6 +21,69 @@ class StevensOperators:
     def jm(self):
         return np.diag(np.sqrt(self.jval*(self.jval+1)-np.arange(-1*self.jval,self.jval+1e-3)[0:-1]*np.arange(-1*self.jval,self.jval+1e-3)[1:]),k=-1)
 
+    def build_ham(self,bdict):
+        ham = np.zeros_like(self.jz())
+        for m,bval in zip(range(3),bdict['B2']):
+            ham+=bval*self.o_mat(2,m)
+        for m,bval in zip(range(5),bdict['B4']):
+            ham+=bval*self.o_mat(4,m)
+        for m,bval in zip(range(7),bdict['B6']):
+            ham+=bval*self.o_mat(6,m)
+        return ham
+
+
+    @staticmethod
+    def calc_eigvals(ham):
+        return np.linalg.eigh(ham)
+
+    def o_mat(self,l,m):
+        if l == 2:
+            if m == 0:
+                omat = self.o_2_0()
+            elif m == 1:
+                omat = self.o_2_1()
+            elif m == 2:
+                omat = self.o_2_2()
+            else:
+                print('Invalid value of m. m cannot be greater than l')
+                omat = 0.0
+        elif l == 4:
+            if m == 0:
+                omat = self.o_4_0()
+            elif m == 1:
+                omat = self.o_4_1()
+            elif m == 2:
+                omat = self.o_4_2()
+            elif m == 3:
+                omat = self.o_4_3()
+            elif m == 4:
+                omat = self.o_4_4()
+            else:
+                print('Invalid value of m. m cannot be greater than l')
+                omat = 0.0
+        elif l == 6:
+            if m == 0:
+                omat = self.o_6_0()
+            elif m == 1:
+                omat = self.o_6_1()
+            elif m == 2:
+                omat = self.o_6_2()
+            elif m == 3:
+                omat = self.o_6_3()
+            elif m == 4:
+                omat = self.o_6_4()
+            elif m == 5:
+                omat = self.o_6_5()
+            elif m == 6:
+                omat = self.o_6_6()
+            else:
+                print('Invalid value of m. m cannot be greater than l')
+                omat = 0.0
+        else:
+            print('Invalid value of l. l must be 2,4,6')
+            omat = 0.0
+        return omat
+
     # now define the Stevens Operators. This is based on Hutching 1964
     # functions are checked against the tabulated values in this paper
 
@@ -43,17 +106,26 @@ class StevensOperators:
         return o60
 
     # m =1 terms
-    # these are always 0 I think, but let's put some dummy terms to help with indexing
     def o_2_1(self):
-        o21 = 0*self.jz()
+        term1 = self.jz()
+        term2 = self.jp() + self.jm()
+        o21 = 0.25*(term1@term2 + term2@term1)
         return o21
 
     def o_4_1(self):
-        o41 = 0*self.jz()
+        term1 = 7*np.linalg.matrix_power(self.jz(),3) - 3*self.j2()@self.jz() + self.jz()
+        term2 = self.jp() + self.jm()
+        o41 = 0.25 * (term1 @ term2 + term2 @ term1)
         return o41
 
     def o_6_1(self):
-        o61 = 0*self.jz()
+        term1 = (33 * np.linalg.matrix_power(self.jz(), 5)
+                 - 30*self.j2()@np.linalg.matrix_power(self.jz(),3)
+                 - 15*np.linalg.matrix_power(self.jz(),3)
+                 + 5*self.j2()@self.j2()@self.jz() - 10*self.j2()@self.jz()
+                 + 12*self.jz())
+        term2 = self.jp() + self.jm()
+        o61 = 0.25 * (term1 @ term2 + term2 @ term1)
         return o61
 
     # m = 2 terms
@@ -74,3 +146,39 @@ class StevensOperators:
         term2 = self.jp()@self.jp() + self.jm()@self.jm()
         o62 = 0.25 * (term1 @ term2 + term2 @ term1)
         return o62
+
+    # m = 3 terms
+    def o_4_3(self):
+        term1 = self.jz()
+        term2 = np.linalg.matrix_power(self.jp(),3) + np.linalg.matrix_power(self.jm(),3)
+        o43 = 0.25*(term1@term2 + term2@term1)
+        return o43
+
+    def o_6_3(self):
+        term1 = 11*np.linalg.matrix_power(self.jz(),3) - 3*self.jz()@self.j2() - 59*self.jz()
+        term2 = np.linalg.matrix_power(self.jp(),3) + np.linalg.matrix_power(self.jm(),3)
+        o63 = 0.25*(term1@term2 + term2@term1)
+        return o63
+
+    # m=4 terms
+    def o_4_4(self):
+        o44 = 0.5*(np.linalg.matrix_power(self.jp(),4) + np.linalg.matrix_power(self.jm(),4))
+        return o44
+
+    def o_6_4(self):
+        term1 = 11*self.jz()@self.jz() - self.j2() - 38*np.eye(int(2*self.jval+1))
+        term2 = np.linalg.matrix_power(self.jp(),4) + np.linalg.matrix_power(self.jm(),4)
+        o64 = 0.25*(term1@term2 + term2@term1)
+        return o64
+
+    # m=5 terms.
+    def o_6_5(self):
+        term1 = self.jz()
+        term2 = np.linalg.matrix_power(self.jp(), 5) + np.linalg.matrix_power(self.jm(), 5)
+        o65 = 0.25 * (term1 @ term2 + term2 @ term1)
+        return o65
+
+    # m=6 terms
+    def o_6_6(self):
+        o66 = 0.5*(np.linalg.matrix_power(self.jp(),6) + np.linalg.matrix_power(self.jm(),6))
+        return o66
