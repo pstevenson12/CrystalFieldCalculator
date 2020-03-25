@@ -2,6 +2,13 @@ import numpy as np
 
 
 class StevensOperators:
+    # this class contains the functions for building a Hamiltonian using
+    # the Steven's operator formalism. This gives us some nice physical
+    # intuition for the operators because we can construct them using only
+    # Jz, J+, J- and J^2. However, this comes at the cost of assuming that only
+    # states within the same angular momentum manifold couple.
+    # The structure of CrystalFieldREI should allow you to replace this
+    # set of functions with your own if you don't want to make this assumption.
 
     def __init__(self,jval):
         self.jval = jval
@@ -31,6 +38,10 @@ class StevensOperators:
             ham+=bval*self.o_mat(6,m)
         return ham
 
+    def proc_ham(self,ham):
+        eigvals, eigvecs = self.calc_eigvals(ham)
+        out_dict = {'eigenvalues':eigvals,'eigenvecs':eigvecs,'Jval':self.jval}
+        return out_dict
 
     @staticmethod
     def calc_eigvals(ham):
