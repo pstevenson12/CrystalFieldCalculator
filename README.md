@@ -18,7 +18,7 @@
 The usage of PointChargeFunctions.py is
 
     from PointChargeFunctions import *
-    pc = PointChargeFunctions()
+    pc = PointCharge()
     cf_params = pc.calc_cf_params(ion_coords)
  
  where *cf_params* returns a dictionary with elements *B2*, *B4* and *B6* which are arrays of size 3,5 and 7, respectively. These elements are the m elements of the B^l_m terms.
