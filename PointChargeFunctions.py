@@ -28,7 +28,7 @@ class PointCharge:
         self.spectre_scaling = np.zeros((7,7))
         self.spectre_scaling[2, 0] = 0.5
         self.spectre_scaling[2, 1] = np.sqrt(6)
-        self.spectre_scaling[2, 2] = 0.6*np.sqrt(6)
+        self.spectre_scaling[2, 2] = 0.5*np.sqrt(6)
         self.spectre_scaling[4, 0] = 0.125
         self.spectre_scaling[4, 1] = 0.5*np.sqrt(5)
         self.spectre_scaling[4, 2] = 0.25*np.sqrt(10)

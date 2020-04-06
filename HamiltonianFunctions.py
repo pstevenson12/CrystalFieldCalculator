@@ -12,9 +12,18 @@ class StevensOperators:
 
     def __init__(self,jval):
         self.jval = jval
+        self.bfieldvec = [0,0,0] # applied Bfield (x,y,z) in Gauss
+        self.ub_cm = 4.66e-5
+        self.Sval = 3/2
+        self.Lval = self.jval - self.Sval
+        self.gj = 1.5 + (self.Sval*(self.Sval+1) - self.Lval*(self.Lval+1))/(2*self.jval*(self.jval+1))
 
     # define some of the basic angular momentum operators.
     # this should keep things (relatively) compact later
+
+    def set_bfield(self,bfield_in):
+        self.bfieldvec = bfield_in
+        return
 
     def j2(self):
         return self.jval*(self.jval+1)*np.eye(int(2*self.jval+1))
@@ -36,6 +45,9 @@ class StevensOperators:
             ham+=bval*self.o_mat(4,m)
         for m,bval in zip(range(7),bdict['B6']):
             ham+=bval*self.o_mat(6,m)
+        ham+=(self.ub_cm*self.gj*self.bfieldvec[0]*0.5*(self.jp() + self.jm())
+              + self.ub_cm*self.gj*self.bfieldvec[1]*0.5*(self.jp() + self.jm())
+              + self.ub_cm*self.gj*self.bfieldvec[2]*self.jz())
         return ham
 
     def proc_ham(self,ham):
