@@ -43,15 +43,17 @@ class PointCharge:
         self.spectre_scaling[6, 6] = 1 / 16 * np.sqrt(231)
 
         self.echarge = -1.6e-19  # in C
-        self.eps0 = 8.854e-12  # in F/m
-        self.a0 = 5.3e-11  # in m
+        # self.eps0 = 8.854e-12  # in F/m
+        # self.a0 = 5.3e-11  # in m
+        self.eps0 = 8.854e-22  # in F/A
+        self.a0 = 5.3e-1  # in A
         return
 
     @staticmethod
     def cart_to_polar(ions):
         # ions array should be in the form x,y,z,q, with Er at (0,0,0)
         r_vec = np.sqrt(ions[:, 0] ** 2 + ions[:, 1] ** 2 + ions[:, 2] ** 2)
-        phi_vec = np.arctan(ions[:, 1] / ions[:, 0])
+        phi_vec = np.arctan2(ions[:, 1], ions[:, 0])
         phi_vec[np.isnan(phi_vec)] = 0.0
         theta_vec = np.arccos(ions[:, 2] / r_vec)
         return r_vec, phi_vec, theta_vec
@@ -72,7 +74,7 @@ class PointCharge:
         sum_vec = ions[:, 3] / np.power(r_vec, l + 1) * np.power(self.a0, l) * self.rad_avg[l] * np.real(
             sph_harm(m, l, phi_vec, theta_vec))
         temp = prefactor * np.sum(sum_vec) * self.stevens[l] * self.spectre_scaling[l,m]
-        return -1 * temp * 6.24e21 * 8.06554
+        return 1 * temp * 6.24e21 * 8.06554
 
     def calc_cf_params(self,ions):
         lvec = [2, 4, 6]
