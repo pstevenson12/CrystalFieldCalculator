@@ -86,7 +86,7 @@ class SpectrumCalculator:
             for n, es_vec in enumerate(es_dict['eigenvecs'].T):
                 gs_vec[np.abs(gs_vec) < 1e-15] = 0.0
                 es_vec[np.abs(es_vec) < 1e-15] = 0.0
-                ref_mat = np.outer(gs_vec, es_vec)
+                ref_mat = np.outer(np.conj(gs_vec), es_vec)
                 inten_mat = (m_mat[:, :] * ref_mat) ** 2
                 spec_mat[m, n] = np.sum(np.sum(inten_mat))
 
